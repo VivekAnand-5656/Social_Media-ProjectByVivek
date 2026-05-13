@@ -34,3 +34,8 @@ def createPost(
     return user_controller.createPost(
         caption,file,db,user
     )
+
+# ==== Delete Posts ====
+@user_routes.delete("/deletepost/{postid}")
+def removePost(postid:int,db:Session = Depends(getDb),user:UserModel=Depends(isLogin)):
+    return user_controller.deletePost(postid,db,user)

@@ -6,8 +6,7 @@ from src.dtos.userSchemas import LoginSchema, CreateAccountSchema, PostSchema
 from src.models.users import UserModel, PostModel
 from src.config.service import upload_image
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
-from src.utills.security import isLogin
+from fastapi import HTTPException 
 password_hash = PasswordHash.recommended()
 
 # ==== Password Hashing =====
@@ -95,3 +94,19 @@ def createPost(
 def getPosts(db:Session):
     posts = db.query(PostModel).all()
     return posts
+
+# === Delete Post ====
+def deletePost(postid:int,db:Session,user):
+    post = db.query(PostModel).filter(PostModel.id == postid).first()
+
+    if not post:
+        raise HTTPException(404, detail="Post not found")
+    if post.user_id != user.id:
+        raise HTTPException(403, detail="You are not allowed to delete this post")
+    
+    db.delete(post)
+    db.commit() 
+
+    return {
+        "msg":"Post Deleted Successfully"
+    }
