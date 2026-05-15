@@ -17,3 +17,6 @@ class PostSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+class CommentSchema(BaseModel):
+    commentstr : str
