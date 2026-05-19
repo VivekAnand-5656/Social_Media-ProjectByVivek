@@ -5,7 +5,7 @@ from pwdlib import PasswordHash
 from src.dtos.userSchemas import LoginSchema, CreateAccountSchema, PostSchema, CommentSchema
 from src.models.users import UserModel, PostModel, LikeModel, CommentModel, FollowModel
 from src.config.service import upload_image
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from fastapi import HTTPException 
 from sqlalchemy import or_
 password_hash = PasswordHash.recommended()
@@ -93,12 +93,14 @@ def createPost(
 
 # === Get Posts ====
 def getPosts(db:Session):
-    posts = db.query(PostModel).all()
+    # posts = db.query(PostModel).all()
+    posts = db.query(PostModel).options(joinedload(PostModel.comments)).options(joinedload(PostModel.user)).all()
     return posts
  
 # ==== User Get My Posts ====
 def getMyPost(db:Session,user):
     posts = db.query(PostModel).filter(PostModel.user_id == user.id).all()
+    # posts = db.query(PostModel).options(join)
     return posts
 
 # === Delete Post ====
@@ -163,7 +165,7 @@ def comment(postid:int,body:CommentSchema,db:Session,user):
 
     db.add(newComment)
     post.commentcount += 1
-    post.comment = newComment.commentStr
+    # post.comment = newComment.commentStr
     db.commit()
     db.refresh(newComment)
 
@@ -238,3 +240,17 @@ def unFollow(userid: int, db: Session, user):
     db.commit()
 
     return {"msg": "Unfollow Successfully"}
+
+# ==== My Followers =====
+def myFollowers(userid:int,db:Session,user):
+    # followers = db.query(FollowModel).filter(FollowModel.followingId == userid).all()
+    followers = db.query(UserModel).join(FollowModel, FollowModel.followerId == UserModel.id).filter(FollowModel.followingId == userid).all()
+    if not followers:
+        raise HTTPException(404,detail="No Followers")
+    return followers
+# ==== My Followings ======
+def myFollowing(userid:int,db:Session,user):
+    followings = db.query(UserModel).join(FollowModel, FollowModel.followingId == UserModel.id).filter(FollowModel.followerId == userid).all()
+    if not followings:
+        raise HTTPException(404, detail="No Followings")
+    return followings

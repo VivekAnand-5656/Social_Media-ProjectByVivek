@@ -37,11 +37,10 @@ class PostModel(Base):
     createdAt = Column(DateTime(timezone=True), server_default=func.now())
     image = Column(String, nullable=True)
     likeCount = Column(Integer,default=0)
-    commentcount = Column(Integer,default=0)
-    comment = Column(String)
+    commentcount = Column(Integer,default=0) 
 
     user = relationship("UserModel",back_populates="posts") 
-    likes = relationship("LikeModel",back_populates="post")
+    likes = relationship("LikeModel",back_populates="post",cascade="all, delete")
     comments = relationship("CommentModel",back_populates="post", cascade="all, delete")
 
 # ===== Like Model ====

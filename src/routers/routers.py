@@ -73,4 +73,13 @@ def userFollow(userid:int,db:Session=Depends(getDb),user:UserModel=Depends(isLog
 @user_routes.post("/unfollow/{userid}")
 def userUnFollow(userid:int,db:Session=Depends(getDb),user:UserModel=Depends(isLogin)):
     return user_controller.unFollow(userid,db,user)
-# ============= Follow Section Reh gya hai bhai =======
+ 
+# ======== My Followers =====
+@user_routes.get("/myfollowers/{userid}")
+def myfollowers(userid:int,db:Session = Depends(getDb),user:UserModel=Depends(isLogin)):
+    return user_controller.myFollowers(userid,db,user)
+
+# ===== My Followings =====
+@user_routes.get("/myfollowings/{userid}")
+def myfollowings(userid:int,db:Session = Depends(getDb),user:UserModel=Depends(isLogin)):
+    return user_controller.myFollowing(userid,db,user)
